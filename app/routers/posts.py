@@ -18,7 +18,7 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, search: Optional[s
     return posts
 
 
-@router.post("/", response_model=PostResponse)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
 def create_post(post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     new_post = Post(title=post.title, content=post.content, published=post.published, user_id=current_user.id)
     db.add(new_post)
