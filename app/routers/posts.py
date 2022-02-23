@@ -37,7 +37,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @router.put("/{id}", response_model=PostResponse)
-def update_post(id: int, post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
+def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(get_current_user)):
     post_query = db.query(Post).filter(Post.id == id)
     post = post_query.first()
     if post is None:
@@ -45,7 +45,7 @@ def update_post(id: int, post: PostCreate, db: Session = Depends(get_db), curren
                             detail="No such post")
     if post.user_id != current_user.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to perform requested action")
-    post_query.update(post.dict(), synchronize_session=False)
+    post_query.update(updated_post.dict(), synchronize_session=False)
     db.commit()
     return post_query.first()
 

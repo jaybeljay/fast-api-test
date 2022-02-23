@@ -6,9 +6,10 @@ from sqlalchemy.orm import sessionmaker
 from app.db import Base, get_db
 from app.main import app
 from app.oauth2 import create_access_token
-from app.models import Post
+from app.models import Post, Vote
+from app.config import settings
 
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:password@localhost:5432/fastrestapitest"
+SQLALCHEMY_DATABASE_URL = f"postgresql://{settings.database_username}:{settings.database_password}@{settings.database_hostname}:{settings.database_port}/{settings.database_name}"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
@@ -89,3 +90,10 @@ def test_posts(test_user, session):
     session.commit()
     posts_db = session.query(Post).all()
     return posts_db
+
+
+@pytest.fixture
+def create_test_vote(session, test_posts, test_user):
+    new_vote = Vote(post_id=test_posts[0].id, user_id=test_user['id'])
+    session.add(new_vote)
+    session.commit()
